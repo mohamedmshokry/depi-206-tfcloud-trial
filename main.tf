@@ -22,7 +22,7 @@ resource "aws_instance" "web-01" {
   ami                    = var.web-01-ami
   instance_type          = var.web-01-instance-type
   key_name               = aws_key_pair.web-01-key.key_name
-  vpc_security_group_ids = [aws_security_group.web-01-sg.id]
+  vpc_security_group_ids = [web-01-sg.id]
   for_each = toset(var.webservers)
   user_data = file("user-data.sh")
 
@@ -31,37 +31,48 @@ resource "aws_instance" "web-01" {
   }
 }
 
-resource "aws_security_group" "web-01-sg" {
+module "web-01-sg" {
+  source = "terraform-aws-modules/security-group/aws//modules/http-80"
+
   name        = "web-01-sg"
-  description = "Allow ssh and http inbound traffic"
+  description = "Security group for web-server with HTTP ports open within VPC"
   vpc_id      = data.aws_vpc.default.id
+  ingress_rules            = ["https-443-tcp", "http-80-tcp", "ssh-tcp"]
 
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  ingress_cidr_blocks = ["10.10.0.0/16"]
 }
+
+# resource "aws_security_group" "web-01-sg" {
+#   name        = "web-01-sg"
+#   description = "Allow ssh and http inbound traffic"
+#   vpc_id      = data.aws_vpc.default.id
+
+#   ingress {
+#     from_port   = 22
+#     to_port     = 22
+#     protocol    = "tcp"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+
+#   ingress {
+#     from_port   = 80
+#     to_port     = 80
+#     protocol    = "tcp"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+
+#   ingress {
+#     from_port   = 443
+#     to_port     = 443
+#     protocol    = "tcp"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+
+
+#   egress {
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "-1"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+# }
