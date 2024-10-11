@@ -5,3 +5,4 @@ private-key-data = {
     "rsa_bits" = 4069
 }
 webservers = ["web-01", "web-03", "web-04"]
+web-01-bucket-name = "depi-206-bucket-name"

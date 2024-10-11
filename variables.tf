@@ -14,3 +14,8 @@ variable "webservers" {
   type = list(string)
   description = "List of web servers"
 }
+
+variable "web-01-bucket-name" {
+  type = string
+  description = "Name of web-01 bucket"
+}
