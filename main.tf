@@ -22,7 +22,7 @@ resource "aws_instance" "web-01" {
   ami                    = var.web-01-ami
   instance_type          = var.web-01-instance-type
   key_name               = aws_key_pair.web-01-key.key_name
-  vpc_security_group_ids = module.web-01-sg.security_group_id
+  vpc_security_group_ids = [module.web-01-sg.security_group_id]
   for_each = toset(var.webservers)
   user_data = file("user-data.sh")
 
